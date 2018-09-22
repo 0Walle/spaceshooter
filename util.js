@@ -9,14 +9,14 @@ fontload = false;
 soundload = 0;
 imageload = false;
 
-/*WebFont.load({
+WebFont.load({
     google: {
         families: ['Press Start 2P']
     },
     active: function() {
         fontload = true;
     }
-});*/
+});
 fontload = true;
 //function renderText() {
 //ctx.fillText("Play",0,16);
