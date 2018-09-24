@@ -65,6 +65,7 @@ chaserimg = image.get(6,0)
 playerimg = image.get(0,0)
 enemy1img = image.get(0,3)
 enemy2img = image.get(1,3)
+enemy3img = image.get(3,3)
 
 player = new Player(playerimg,0,0)
 
@@ -118,6 +119,10 @@ function update(e){
         }
         if(Math.random()<0.04){ //0.04
             enemys.push(new Enemy(enemy2img,Math.floor(Math.random()*224+10),0,1));
+        }
+        if(Math.random()<0.02){ //0.08
+            enemys.push(new Enemy(enemy3img,Math.floor(Math.random()*224+10),0,4));
+            //enemys.push(new Enemy(enemy1img,Math.sin(time/100)*112+112,0,0));
         }
 
         spawntime = Math.floor(Math.random()*15)
@@ -191,6 +196,19 @@ function update(e){
                 player.health -= 0.6;
                 rays.splice(i,1);
             };
+        }else if (rays[i].owner=="enemy4"){
+
+            rays[i].y += rays[i].dy*3
+            rays[i].x += rays[i].dx*3
+
+            if(rays[i].y>192){
+                rays.splice(i,1);
+                continue;
+            }
+            if (collideP(rays[i],player.rect)) {
+                player.health -= 1.5;
+                rays.splice(i,1);
+            };
         }
     };
 
@@ -222,7 +240,14 @@ function update(e){
             //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
             rays.push(new Ray("enemy3",enemys[i].x+4,enemys[i].y+9,1,1,'#f00'))
             rays.push(new Ray("enemy3",enemys[i].x+10,enemys[i].y+9,1,1,'#f00'))
-            enemys[i].shootdelay = 10; //10
+            enemys[i].shootdelay = 100; //10
+        }else if(enemys[i].type==4 && enemys[i].shootdelay==0){
+            angle = Math.atan2(player.y-enemys[i].y-16,player.x-enemys[i].x+6)
+            //angle2 = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x)
+            //rays.push(new Ray("enemy1",enemys[i].x+4,enemys[i].y+12,1,1,'#f00',Math.cos(angle),Math.sin(angle)))
+            //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
+            rays.push(new Ray("enemy4",enemys[i].x+6,enemys[i].y+8,2,2,'#f00',Math.cos(angle),Math.sin(angle)))
+            enemys[i].shootdelay = 150; //8
         }
         else if(enemys[i].health<=0){
             if(enemys[i].type==0){

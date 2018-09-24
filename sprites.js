@@ -110,6 +110,8 @@ function Enemy(image,x,y,type) {
             this.y += 1.0;
             this.x -= this.y/50;
             //this.x += Math.sin(this.y/192);
+        }else if (this.type==4){
+            this.y += 0.3;
         }
         if(this.shootdelay>0) this.shootdelay -= 1;
         this.rect.x = this.x

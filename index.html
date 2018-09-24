@@ -8,14 +8,40 @@
     <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <style>
         body{
-            margin: 0px;
+            margin: 5px;
             overflow: hidden;
+            background-color: black
         }
         canvas {
+            display: inline-block;
+            border: 1px solid grey;
+            border-radius: 2px;
+        }
+        #info{
+            display: block;
+            float: left;
+            border: 1px solid grey;
+            border-radius: 5px;
+            color: white;
+            margin-right: 10px;
+            width: 250px;
+            padding: 5px;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 12px;
+        }
+
+        ul{
+            list-style-type: none;
         }
     </style>
 </head>
 <body>
+    <div id='info'>
+        Instructions:<br>
+        <ul>
+            <li>Press X to shoot</li>
+        </ul>
+    </div>
     <canvas id="canvas" width="768" height="576"></canvas>
     <script src="util.js"></script>
 </body>
