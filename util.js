@@ -99,7 +99,7 @@ function update(e){
         if ((keys['ArrowLeft'] || keys['a']) && player.x > 0) player.x-=2;
         if ((keys['ArrowDown'] || keys['s']) && player.y < 176) player.y+=2;
         if ((keys['ArrowRight'] || keys['d']) && player.x < 244) player.x+=2;
-        if (keys['x'] || keys['Space']){
+        if (keys['x'] || keys[' ']){
             if (player.shootdelay==0){
                 rays.push(new Ray("player",player.x+5,player.y-5,1,5,'#0f0'))
                 player.shootdelay = player.frequency;
