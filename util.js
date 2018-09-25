@@ -95,11 +95,11 @@ function update(e){
     ctx.scale(3,3);
 
     if (player.health>0){
-        if (keys['ArrowUp'] && player.y > 8) player.y-=2;
-        if (keys['ArrowLeft'] && player.x > 0) player.x-=2;
-        if (keys['ArrowDown'] && player.y < 176) player.y+=2;
-        if (keys['ArrowRight'] && player.x < 244) player.x+=2;
-        if (keys['x']){
+        if ((keys['ArrowUp'] || keys['w']) && player.y > 8) player.y-=2;
+        if ((keys['ArrowLeft'] || keys['a']) && player.x > 0) player.x-=2;
+        if ((keys['ArrowDown'] || keys['s']) && player.y < 176) player.y+=2;
+        if ((keys['ArrowRight'] || keys['d']) && player.x < 244) player.x+=2;
+        if (keys['x'] || keys['Space']){
             if (player.shootdelay==0){
                 rays.push(new Ray("player",player.x+5,player.y-5,1,5,'#0f0'))
                 player.shootdelay = player.frequency;
@@ -120,7 +120,7 @@ function update(e){
         if(Math.random()<0.04){ //0.04
             enemys.push(new Enemy(enemy2img,Math.floor(Math.random()*224+10),0,1));
         }
-        if(Math.random()<0.02){ //0.08
+        if(Math.random()<0.015){ //0.02
             enemys.push(new Enemy(enemy3img,Math.floor(Math.random()*224+10),0,4));
             //enemys.push(new Enemy(enemy1img,Math.sin(time/100)*112+112,0,0));
         }
@@ -172,7 +172,7 @@ function update(e){
                 rays.splice(i,1);
             };
         }else if (rays[i].owner=="enemy2"){
-            rays[i].y += 1;
+            rays[i].y += 0.5;
             rays[i].x += rays[i].dx;
             //rays[i].x += rays[i].dx*2;
             //rays[i].y += rays[i].dy*2;
@@ -204,9 +204,15 @@ function update(e){
             if(rays[i].y>192){
                 rays.splice(i,1);
                 continue;
+            }if(rays[i].x<0){
+                rays.splice(i,1);
+                continue;
+            }if(rays[i].x>255){
+                rays.splice(i,1);
+                continue;
             }
             if (collideP(rays[i],player.rect)) {
-                player.health -= 1.5;
+                player.health -= 0.6;
                 rays.splice(i,1);
             };
         }
@@ -240,9 +246,9 @@ function update(e){
             //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
             rays.push(new Ray("enemy3",enemys[i].x+4,enemys[i].y+9,1,1,'#f00'))
             rays.push(new Ray("enemy3",enemys[i].x+10,enemys[i].y+9,1,1,'#f00'))
-            enemys[i].shootdelay = 100; //10
+            enemys[i].shootdelay = 10; //10
         }else if(enemys[i].type==4 && enemys[i].shootdelay==0){
-            angle = Math.atan2(player.y-enemys[i].y-16,player.x-enemys[i].x+6)
+            angle = Math.atan2((player.y+8)-(enemys[i].y+8),(player.x+8)-(enemys[i].x+6))
             //angle2 = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x)
             //rays.push(new Ray("enemy1",enemys[i].x+4,enemys[i].y+12,1,1,'#f00',Math.cos(angle),Math.sin(angle)))
             //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
@@ -251,7 +257,7 @@ function update(e){
         }
         else if(enemys[i].health<=0){
             if(enemys[i].type==0){
-                player.score += 500;
+                player.score += 10000; //500
                 if (Math.random()<0.1){
                     for (var c_ = 0; c_ < 8; c_++) {
                         if (Math.random()<0.75) itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
@@ -262,7 +268,7 @@ function update(e){
                     else itens.push(new Item(repairimg,enemys[i].x+4,enemys[i].y+4,1));
                 }
             }if(enemys[i].type==1){
-                player.score += 800;
+                player.score += 10000; //800
                 if (Math.random()<0.50) itens.push(new Item(boostimg,enemys[i].x+4,enemys[i].y+4,2));
                 else if (Math.random()<0.10) itens.push(new Item(boostimg,enemys[i].x+4,enemys[i].y+4,2));
                 else{
@@ -270,7 +276,7 @@ function update(e){
                     itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
                 }
             }if(enemys[i].type==2 || enemys[i].type==3){
-                player.score += 800;
+                player.score += 10000; //800
                 if (Math.random()<0.5){
                     for (var c_ = 0; c_ < 10; c_++) {
                         if (Math.random()<0.5) itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
@@ -279,6 +285,15 @@ function update(e){
                     if (Math.random()<0.2) itens.push(new Item(boostimg,enemys[i].x+4,enemys[i].y+4,2));
                 }else{
                     itens.push(new Item(repairimg,enemys[i].x+4,enemys[i].y+4,1));
+                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
+                }
+            }if(enemys[i].type==4){
+                player.score += 10000; //800
+                if (Math.random()<0.20) itens.push(new Item(strenghtimg,enemys[i].x+4,enemys[i].y+4,3));
+                else{
+                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
+                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
+                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
                     itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
                 }
             }
@@ -305,6 +320,7 @@ function update(e){
         if (collide(itens[i].rect,player.rect)){
             if(itens[i].type==0){
                 player.coincount += 1;
+                player.score += 1;
             }else if(itens[i].type==1){
                 player.health = Math.min(player.health+2,player.health_);
             }else if(itens[i].type==2){
