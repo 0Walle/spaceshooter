@@ -10,12 +10,8 @@ soundload = 0;
 imageload = false;
 
 WebFont.load({
-    google: {
-        families: ['Press Start 2P']
-    },
-    active: function() {
-        fontload = true;
-    }
+    google: {families: ['Press Start 2P']},
+    active: function() {fontload = true;}
 });
 fontload = true;
 //function renderText() {
@@ -24,36 +20,26 @@ fontload = true;
 var pewsnd = document.createElement("audio");
 pewsnd.src = "pew.wav";
 pewsnd.volume = 0.2;
-pewsnd.oncanplay = function() {
-    soundload+=1;
-};
+pewsnd.oncanplay = function() {soundload+=1;};
 
 var coinsnd = document.createElement("audio");
 coinsnd.src = "coin.wav";
-coinsnd.oncanplay = function() {
-    soundload+=1;
-};
+coinsnd.oncanplay = function() {soundload+=1;};
 
 var explsnd = document.createElement("audio");
 explsnd.src = "expl3.wav";
 explsnd.volume = 0.3;
-explsnd.oncanplay = function() {
-    soundload+=1;
-};
+explsnd.oncanplay = function() {soundload+=1;};
 
 var expl1snd = document.createElement("audio");
 expl1snd.src = "expl1.wav";
 expl1snd.volume = 0.3;
-expl1snd.oncanplay = function() {
-    soundload+=1;
-};
+expl1snd.oncanplay = function() {soundload+=1;};
 //pewsnd.play();
 //pewsnd.pause();
 
 image = new SpriteSheet(ctx,"map.png")
-image.image.onload = function() {
-    imageload = true;
-};
+image.image.onload = function() {imageload = true;};
 explosionimg = image.get(0,2)
 
 coinimg = image.get(2,0)
@@ -80,9 +66,7 @@ time = 0;
 function loading(){
     if(fontload==true && imageload==true && soundload==4){
         ctx.font = '8px "Press Start 2P"'
-        //setInterval(update, 1000/60);
         update();
-        //setTimeout(update, 1000/60);
         return;
     }
     setTimeout(loading, 1000/30);
@@ -110,22 +94,29 @@ function update(e){
 
     if (spawntime==0) {
         if(Math.random()<0.08){ //0.08
-            enemys.push(new Enemy(enemy1img,Math.floor(Math.random()*224+10),0,0));
-            //enemys.push(new Enemy(enemy1img,Math.sin(time/100)*112+112,0,0));
+            enemys.push(new EnBasic(Math.floor(Math.random()*224+10),0));
         }
         if(Math.random()<0.01){ //0.01
-            enemys.push(new Enemy(enemy1img,0,0,2));
-            enemys.push(new Enemy(enemy1img,240,0,3));
+            enemys.push(new EnDiverL(0,0));
+            enemys.push(new EnDiverR(240,0));
         }
         if(Math.random()<0.04){ //0.04
-            enemys.push(new Enemy(enemy2img,Math.floor(Math.random()*224+10),0,1));
+            enemys.push(new EnSpreader(Math.floor(Math.random()*224+10),0));
         }
-        if(Math.random()<0.015){ //0.02
-            enemys.push(new Enemy(enemy3img,Math.floor(Math.random()*224+10),0,4));
-            //enemys.push(new Enemy(enemy1img,Math.sin(time/100)*112+112,0,0));
+        if(Math.random()<0.015){ //0.015
+            enemys.push(new EnCannon(Math.floor(Math.random()*224+10),0));
         }
 
-        spawntime = Math.floor(Math.random()*15)
+        if(enemys.length==0){
+            enemys.push(new EnBasic(Math.floor(Math.random()*224+10),0));
+        }
+        /*if(Math.random()<0.18){ //0.08
+            enemys.push(new EnTest(Math.floor(Math.random()*224+10),0));
+        }*/
+        //enemys.push(new EnTest(128,0));
+
+        spawntime = Math.floor(Math.random()*15+5)
+        //spawntime = 240
     };
 
     player.rect.x = player.x+1;
@@ -139,6 +130,7 @@ function update(e){
     if (player.health<=0 && player.health>-50){
         explosions.push(new Explosion(explosionimg,player.x,player.y));
         player.x = -100;
+        player.y = -100;
         expl1snd.play();
         player.health = -100;
     }
@@ -193,7 +185,7 @@ function update(e){
                 continue;
             }
             if (collideP(rays[i],player.rect)) {
-                player.health -= 0.6;
+                player.health -= 0.3;
                 rays.splice(i,1);
             };
         }else if (rays[i].owner=="enemy4"){
@@ -215,6 +207,25 @@ function update(e){
                 player.health -= 0.6;
                 rays.splice(i,1);
             };
+        }else if (rays[i].owner=="enemy101"){
+
+            rays[i].y += Math.cos(rays[i].dx)+1.2
+            rays[i].x += Math.sin(rays[i].dx)
+
+            if(rays[i].y>192){
+                rays.splice(i,1);
+                continue;
+            }if(rays[i].x<0){
+                rays.splice(i,1);
+                continue;
+            }if(rays[i].x>255){
+                rays.splice(i,1);
+                continue;
+            }
+            if (collideP(rays[i],player.rect)) {
+                player.health -= 0.2;
+                rays.splice(i,1);
+            };
         }
     };
 
@@ -223,80 +234,15 @@ function update(e){
         enemys[i].bar.draw(ctx,enemys[i].x,enemys[i].y+14);
         enemys[i].update();
         if(enemys[i].y>192) enemys.splice(i,1);
-        else if(enemys[i].type==0 && enemys[i].shootdelay==0){
-            //angle = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x+16)
-            //angle2 = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x)
-            //rays.push(new Ray("enemy1",enemys[i].x+4,enemys[i].y+12,1,1,'#f00',Math.cos(angle),Math.sin(angle)))
-            //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
-            rays.push(new Ray("enemy1",enemys[i].x+4,enemys[i].y+9,1,1,'#f00'))
-            rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+9,1,1,'#f00'))
-            enemys[i].shootdelay = 100; //100
-        }else if(enemys[i].type==1 && enemys[i].shootdelay==0){
-            //angle = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x+16)
-            //angle2 = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x)
-            //rays.push(new Ray("enemy1",enemys[i].x+4,enemys[i].y+12,1,1,'#f00',Math.cos(angle),Math.sin(angle)))
-            //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
-            rays.push(new Ray("enemy2",enemys[i].x+3,enemys[i].y+8,1,1,'#f00',-1,1))
-            rays.push(new Ray("enemy2",enemys[i].x+11,enemys[i].y+8,1,1,'#f00',1,1))
-            enemys[i].shootdelay = 8; //8
-        }else if((enemys[i].type==2 || enemys[i].type==3) && enemys[i].shootdelay==0){
-            //angle = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x+16)
-            //angle2 = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x)
-            //rays.push(new Ray("enemy1",enemys[i].x+4,enemys[i].y+12,1,1,'#f00',Math.cos(angle),Math.sin(angle)))
-            //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
-            rays.push(new Ray("enemy3",enemys[i].x+4,enemys[i].y+9,1,1,'#f00'))
-            rays.push(new Ray("enemy3",enemys[i].x+10,enemys[i].y+9,1,1,'#f00'))
-            enemys[i].shootdelay = 10; //10
-        }else if(enemys[i].type==4 && enemys[i].shootdelay==0){
-            angle = Math.atan2((player.y+8)-(enemys[i].y+8),(player.x+8)-(enemys[i].x+6))
-            //angle2 = Math.atan2(player.y-enemys[i].y+9,player.x-enemys[i].x)
-            //rays.push(new Ray("enemy1",enemys[i].x+4,enemys[i].y+12,1,1,'#f00',Math.cos(angle),Math.sin(angle)))
-            //rays.push(new Ray("enemy1",enemys[i].x+10,enemys[i].y+12,1,1,'#f00',Math.cos(angle2),Math.sin(angle2)))
-            rays.push(new Ray("enemy4",enemys[i].x+6,enemys[i].y+8,2,2,'#f00',Math.cos(angle),Math.sin(angle)))
-            enemys[i].shootdelay = 150; //8
-        }
-        else if(enemys[i].health<=0){
-            if(enemys[i].type==0){
-                player.score += 10000; //500
-                if (Math.random()<0.1){
-                    for (var c_ = 0; c_ < 8; c_++) {
-                        if (Math.random()<0.75) itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                        else itens.push(new Item(repairimg,enemys[i].x+4,enemys[i].y+4,1));
-                    };
-                }else{
-                    if (Math.random()<0.70) itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                    else itens.push(new Item(repairimg,enemys[i].x+4,enemys[i].y+4,1));
-                }
-            }if(enemys[i].type==1){
-                player.score += 10000; //800
-                if (Math.random()<0.50) itens.push(new Item(boostimg,enemys[i].x+4,enemys[i].y+4,2));
-                else if (Math.random()<0.10) itens.push(new Item(boostimg,enemys[i].x+4,enemys[i].y+4,2));
-                else{
-                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                }
-            }if(enemys[i].type==2 || enemys[i].type==3){
-                player.score += 10000; //800
-                if (Math.random()<0.5){
-                    for (var c_ = 0; c_ < 10; c_++) {
-                        if (Math.random()<0.5) itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                        else if (Math.random()<0.5) itens.push(new Item(repairimg,enemys[i].x+4,enemys[i].y+4,1));
-                    };
-                    if (Math.random()<0.2) itens.push(new Item(boostimg,enemys[i].x+4,enemys[i].y+4,2));
-                }else{
-                    itens.push(new Item(repairimg,enemys[i].x+4,enemys[i].y+4,1));
-                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                }
-            }if(enemys[i].type==4){
-                player.score += 10000; //800
-                if (Math.random()<0.20) itens.push(new Item(strenghtimg,enemys[i].x+4,enemys[i].y+4,3));
-                else{
-                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                    itens.push(new Item(coinimg,enemys[i].x+4,enemys[i].y+4,0));
-                }
-            }
+        else{
+        angle = Math.atan2((player.y+8)-(enemys[i].y+8),(player.x+8)-(enemys[i].x+6))
+        nrays = enemys[i].fire(angle)
+        if(nrays) rays = rays.concat(nrays)
+
+        if(enemys[i].health<=0){
+            nloot = enemys[i].loot()
+            player.score += nloot.score
+            itens = itens.concat(nloot.loot)
             explosions.push(new Explosion(explosionimg,enemys[i].x,enemys[i].y))
             enemys.splice(i,1);
             explsnd.play();
@@ -305,7 +251,8 @@ function update(e){
             player.health -= 5;
             enemys.splice(i,1);
             expl1snd.play();
-        }  
+        }
+        }
     };
 
     for (var i = explosions.length - 1; i >= 0; i--) {
@@ -320,7 +267,6 @@ function update(e){
         if (collide(itens[i].rect,player.rect)){
             if(itens[i].type==0){
                 player.coincount += 1;
-                player.score += 1;
             }else if(itens[i].type==1){
                 player.health = Math.min(player.health+2,player.health_);
             }else if(itens[i].type==2){
@@ -363,12 +309,12 @@ function update(e){
         setTimeout(update, 1000/20);
     }
 
-    if(player.coincount>player.health_){
+    /*if(player.coincount>player.health_){
         player.coincount-=player.health_
         player.health_+= 10
         player.health = player.health_
         player.damage_+= 1
-    }
+    }*/
     
 }
 
