@@ -47,9 +47,26 @@ function Player(image,x,y) {
     this.rect.h = 11
 
     this.bar = new Lifebar(this.health,this.health_)
+
+    this.reset = function() {
+        this.health = 20
+        this.health_ = 20
+        this.score = 0
+        this.coincount = 0
+        this.frequency = 15
+        this.damage = 2
+        this.damage_ = 2
+        this.chasing = false
+        this.shootdelay = 0
+        this.chasetime = 0
+        this.boosttime = 0
+        this.stengtime = 0
+        this.bar.total = this.health_
+        this.bar.value = this.health
+    }
 }
 
-function Ray(owner,x,y,w,h,color,dirx=0,diry=0) {
+function Ray(owner,x,y,w,h,color,damage,dirx=0,diry=0) {
     this.x = x
     this.y = y
     this.w = w
@@ -58,6 +75,7 @@ function Ray(owner,x,y,w,h,color,dirx=0,diry=0) {
     this.dy = diry
     this.color = color
     this.owner = owner
+    this.damage = damage
     
     this.draw = function(ctx) {
         ctx.fillStyle = this.color;
@@ -65,7 +83,7 @@ function Ray(owner,x,y,w,h,color,dirx=0,diry=0) {
     };
 
     this.outBounds = function(){
-        if(this.y>192 || this.x<0 || this.x>255){
+        if(this.y>192 || this.x<-8 || this.x>255 || this.y < -8){
             return true    
         }
     }
@@ -85,7 +103,7 @@ function Lifebar(total,value) {
             ctx.fillStyle = '#f00'
             ctx.fillRect(x,y,16,1);
             ctx.fillStyle = '#0f0'
-            ctx.fillRect(x,y,Math.floor((16*this.display)/(this.total*5)),1);
+            ctx.fillRect(x,y,(16*this.display)/(this.total*5),1);
         }
     };
 }
@@ -132,8 +150,8 @@ function EnBasic(x,y) {
     this.fire = function() {
         if(this._fire()){
             return [
-                new Ray("enemy1",this.x+4,this.y+9,1,1,'#f00'),
-                new Ray("enemy1",this.x+10,this.y+9,1,1,'#f00')
+                new Ray("enemy1",this.x+4,this.y+9,1,1,'#f00',0.2),
+                new Ray("enemy1",this.x+10,this.y+9,1,1,'#f00',0.2)
             ]
         }
     }
@@ -166,8 +184,8 @@ function EnSpreader(x,y) {
     this.fire = function() {
         if(this._fire()){
             return [
-                new Ray("enemy2",this.x+3,this.y+8,1,1,'#f00',-1,1),
-                new Ray("enemy2",this.x+11,this.y+8,1,1,'#f00',1,1)
+                new Ray("enemy2",this.x+3,this.y+8,1,1,'#f00',0.2,-1,1),
+                new Ray("enemy2",this.x+11,this.y+8,1,1,'#f00',0.2,1,1)
             ]
         }
     }
@@ -197,8 +215,8 @@ function EnDiverL(x,y) {
     this.fire = function() {
         if(this._fire()){
             return [
-                new Ray("enemy3",this.x+4,this.y+9,1,1,'#f00'),
-                new Ray("enemy3",this.x+10,this.y+9,1,1,'#f00')
+                new Ray("enemy3",this.x+4,this.y+9,1,1,'#f00',0.2),
+                new Ray("enemy3",this.x+10,this.y+9,1,1,'#f00',0.2)
             ]
         }
     }
@@ -233,8 +251,8 @@ function EnDiverR(x,y) {
     this.fire = function() {
         if(this._fire()){
             return [
-                new Ray("enemy3",this.x+4,this.y+9,1,1,'#f00'),
-                new Ray("enemy3",this.x+10,this.y+9,1,1,'#f00')
+                new Ray("enemy3",this.x+4,this.y+9,1,1,'#f00',0.2),
+                new Ray("enemy3",this.x+10,this.y+9,1,1,'#f00',0.2)
             ]
         }
     }
@@ -268,7 +286,7 @@ function EnCannon(x,y) {
     this.fire = function(angle) {
         if(this._fire()){
             return [
-                new Ray("enemy4",this.x+6,this.y+8,2,2,'#f00',Math.cos(angle),Math.sin(angle))
+                new Ray("enemy4",this.x+6,this.y+8,2,2,'#f00',0.6,Math.cos(angle),Math.sin(angle))
             ]
         }
     }
@@ -289,7 +307,11 @@ function EnCannon(x,y) {
 function EnTest(x,y) {
     Enemy.call(this,enemy1img,x,y,5)
 
-    this._shootdelay = 2
+    this._shootdelay = 8
+    this.startangle = Math.random()*120
+    
+    // this._shootdelay = 240
+    // this.shootdelay = Math.floor(Math.random()*30)+40
 
     this.update = function () {
         this._update()
@@ -298,9 +320,21 @@ function EnTest(x,y) {
 
     this.fire = function() {
         if(this._fire()){
+            //this.health = 0
             return [
-                new Ray("enemy101",this.x+4,this.y+9,1,1,'#f00',(Math.sin(this.y/12))*Math.PI/3,1),
-                new Ray("enemy101",this.x+10,this.y+9,1,1,'#f00',(-Math.sin(this.y/12))*Math.PI/3,1)
+                new Ray("enemy101",this.x+4,this.y+9,1,1,'#f00',0.1,(Math.sin(this.y/24+this.startangle))*Math.PI/3,1),
+                new Ray("enemy101",this.x+10,this.y+9,1,1,'#f00',0.1,(Math.sin(this.y/24+this.startangle))*Math.PI/3,1)
+                // new Ray("enemy101",this.x+10,this.y+9,2,2,'#f00',(Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+10,this.y+9,2,2,'#f00',(Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+10,this.y+9,2,2,'#f00',(Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+10,this.y+9,2,2,'#f00',(Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+10,this.y+9,2,2,'#f00',(Math.random())*Math.PI,Math.random()+0.2),
+
+                // new Ray("enemy101",this.x+4,this.y+9,2,2,'#f00',(-Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+4,this.y+9,2,2,'#f00',(-Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+4,this.y+9,2,2,'#f00',(-Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+4,this.y+9,2,2,'#f00',(-Math.random())*Math.PI,Math.random()+0.2),
+                // new Ray("enemy101",this.x+4,this.y+9,2,2,'#f00',(-Math.random())*Math.PI,Math.random()+0.2),
             ]
         }
     }
