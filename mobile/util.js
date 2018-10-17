@@ -58,6 +58,15 @@ Gamestate = gsMENU
 
 GGtimer = 0;
 function loading(){
+    ctx.fillStyle = '#0f0'
+    ctx.textAlign = 'center'
+    percent = 0
+    if(fontload==true) percent += 1
+    if(imageload==true) percent += 1
+    if(pewsnd.ready()) percent += 1
+    if(coinsnd.ready()) percent += 1
+    if(expl1snd.ready()) percent += 1
+    if(explsnd.ready()) percent += 1
     if(fontload==true && imageload==true &&
         pewsnd.ready() && coinsnd.ready() &&
         expl1snd.ready() && explsnd.ready()){
@@ -65,7 +74,9 @@ function loading(){
         update();
         return;
     }
-    setTimeout(loading, 1000/30);
+    ctx.fillRect(0,0,canvas.width/6*percent,10)
+    ctx.fillText('LOADING...',canvas.width/2,canvas.height/2)
+    setTimeout(loading, 50);
 }
 
 function update(e){
