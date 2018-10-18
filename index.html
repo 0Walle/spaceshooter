@@ -13,7 +13,7 @@
             background-color: black
         }
         canvas {
-            display: inline-block;
+            /*display: inline-block;*/
             border: 1px solid grey;
             border-radius: 2px;
         }
@@ -30,20 +30,27 @@
             font-size: 12px;
         }
 
+        a{
+            text-decoration: none;
+        }
+
         ul{
             list-style-type: none;
         }
     </style>
 </head>
 <body>
-    <div id='info'>
-        Instructions:<br>
-        <ul>
-            <li>Arrows or WASD to move</li><br>
-            <li>Press X or Space to shoot</li>
-        </ul>
-    </div>
-    <canvas id="canvas" width="768" height="576"></canvas>
+    <table><tr>
+        <td style='vertical-align: top'><div id='info'>
+            Instructions:<br>
+            <ul>
+                <li>Arrows or WASD to move</li><br>
+                <li>Press X or Space to shoot</li>
+            </ul>
+            Check the <a href="https://github.com/wallegame/spaceshooter/wiki">Wiki</a> for more Information
+        </div></td>
+        <td><canvas id="canvas" width="768" height="576"></canvas></td>
+    </tr></table>
     <script src="util.js"></script>
 </body>
 </html>
